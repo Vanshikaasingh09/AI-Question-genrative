@@ -1,0 +1,28 @@
+Question,Answer
+"Here are 10 relevant questions based on the provided text:
+
+1.  What is the command to list all Docker networks available on the system?
+2.  What are the three default networks that come with Docker?
+3.  What information does the `docker network inspect` command provide?
+4.  What are the most common drivers used when creating a new Docker network?
+5.  What is the command to remove a Docker network?
+6.  How do you connect an existing container to a specific network? What command is used?
+7.  What command is used to start a container with a specified network?
+8.  How can you check a container's network configuration, including its IP address?
+9.  How can containers communicate with each other within the same Docker network without using IPs? What command facilitates this?
+10. Briefly outline the steps to demonstrate container communication using Docker DNS.","Here are the answers to your questions, based on the provided text:
+
+1.  The command to list all Docker networks available on the system is `docker network ls`.
+2.  The three default networks that come with Docker are: `bridge`, `host`, and `none`.
+3.  The `docker network inspect` command provides detailed information about a network, including connected containers and their IP addresses.
+4.  The most common drivers used when creating a new Docker network are: `bridge` (default), `host`, and `overlay`.
+5.  The command to remove a Docker network is `docker network rm`.
+6.  To connect an existing container to a specific network, the command is `docker network connect`.
+7.  The command to start a container with a specified network is `docker run --network= -d`.
+8.  You can check a container's network configuration, including its IP addresses, using the command `docker inspect`.
+9.  Containers can communicate with each other within the same Docker network using container names instead of IPs. The command used for this communication is `ping`.
+10. To demonstrate container communication using Docker DNS:
+    *   Step 1: Create a Docker Network.
+    *   Step 2: Start the First Ubuntu Container (Server) and start a Netcat listener on port 1234.
+    *   Step 3: Start the Second Ubuntu Container (Client).
+    *   Step 4: Verify the Message on the Server."

@@ -1,0 +1,11 @@
+streamlit
+python-dotenv~=1.1.0
+PyPDF2
+langchain~=0.3.22
+openai
+faiss-cpu
+
+uvicorn~=0.34.0
+fastapi~=0.115.12
+aiofiles~=24.1.0
+langchain-google-genai~=2.0.10
