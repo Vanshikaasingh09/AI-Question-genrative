@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, Form, Request, Response, File, HTTPException
+from fastapi import FastAPI, Form, Request, Response, File, HTTPException , Depends
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from langchain.chat_models import ChatOpenAI
@@ -17,16 +17,34 @@ import aiofiles
 import csv
 from datetime import datetime
 import uvicorn
-# Initialize FastAPI app
+from dotenv import load_dotenv
+import google.generativeai as genai
+from passlib.context import CryptContext
+from jose import JWTError, jwt
+import psycopg2
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
+from fastapi import FastAPI
+from auth import router as auth_router
+from fastapi.staticfiles import StaticFiles
+
+
+
+
+
 app = FastAPI()
 
+app.include_router(auth_router)
 # Mount the static directory to serve files (for storing PDFs and outputs)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
 
 # Set OpenAI API Key (Make sure to replace with your actual key)
 from dotenv import load_dotenv
 load_dotenv()
-api_key = os.getenv("GEMINI_KEY")
+
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 # Function to process uploaded PDF
@@ -111,34 +129,33 @@ def save_qa_to_csv(file_path):
     return output_file
 
 
-# API route for uploading PDF
 @app.post("/upload")
 async def upload_pdf(pdf_file: bytes = File(...), filename: str = Form(...)):
-    """
-    Uploads the PDF and saves it to the static/docs/ directory.
-    """
-    base_folder = "static/docs/"
-    os.makedirs(base_folder, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    try:
+        base_folder = "static/docs/"
+        os.makedirs(base_folder, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-    # Split original filename to insert timestamp before extension
-    name, ext = os.path.splitext(filename)
-    new_filename = f"{name}_{timestamp}{ext}"
+        name, ext = os.path.splitext(filename)
+        new_filename = f"{name}_{timestamp}{ext}"
 
-    # Join with the base folder
-    pdf_filepath = os.path.join(base_folder, new_filename)
-    # pdf_filepath = os.path.join(base_folder, filename)
+        pdf_filepath = os.path.join(base_folder, new_filename)
 
-    # Save file asynchronously
-    async with aiofiles.open(pdf_filepath, 'wb') as f:
-        await f.write(pdf_file)
+        async with aiofiles.open(pdf_filepath, 'wb') as f:
+            await f.write(pdf_file)
 
-    output_file = save_qa_to_csv(pdf_filepath)
-    return FileResponse(
-        path=output_file,
-        filename="QA.csv",
-        media_type="text/csv"
-    )
+        output_file = save_qa_to_csv(pdf_filepath)
+
+        return FileResponse(
+            path=output_file,
+            filename="QA.csv",
+            media_type="text/csv"
+        )
+
+    except Exception as e:
+        print("❌ Exception during /upload route:", e)
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
 
 
 # data=save_qa_to_csv("static/Code of Conduct (1).pdf")
